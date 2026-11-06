@@ -4,4 +4,4 @@ compatibility_date = "2024-10-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-FRONTEND_ORIGIN = "http://localhost:3000"
+FRONTEND_ORIGIN = "https://crypto-ai-kappa.vercel.app"
