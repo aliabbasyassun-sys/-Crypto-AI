@@ -27,6 +27,7 @@ export default function TradingChart({ candles, levels, prediction }: Props) {
       grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
       timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#374151' },
       rightPriceScale: { borderColor: '#374151' },
+      handleScroll: { vertTouchDrag: false },
       autoSize: true,
     });
 
@@ -116,5 +117,5 @@ export default function TradingChart({ candles, levels, prediction }: Props) {
     });
   }, [levels, candles]);
 
-  return <div ref={containerRef} className="w-full h-[600px] rounded-xl overflow-hidden border border-border" />;
+  return <div ref={containerRef} className="w-full h-[600px] rounded-xl overflow-hidden border border-border touch-pan-y" />;
 }

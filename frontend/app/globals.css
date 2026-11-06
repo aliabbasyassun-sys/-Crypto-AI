@@ -4,6 +4,11 @@
 @tailwind utilities;
 
 body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #0b0e14;
   color: #e5e7eb;
   font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;

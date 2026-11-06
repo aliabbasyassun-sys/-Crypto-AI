@@ -9,7 +9,7 @@ export interface Candle {
 
 const TIMEFRAME_MAP: Record<string, string> = {
   '1m': '1m', '5m': '5m', '15m': '15m', '30m': '30m',
-  '1H': '1H', '4H': '4H', '1D': '1D',
+  '1h': '1h', '2h': '2h', '4h': '4h', '6h': '6h', '12h': '12h', '1d': '1d',
 };
 
 export async function getCandles(
@@ -17,14 +17,20 @@ export async function getCandles(
   tf: string,
   limit = 300
 ): Promise<Candle[]> {
-  const bar = TIMEFRAME_MAP[tf] ?? '1H';
-  const url = `https://www.okx.com/api/v5/market/candles?instId=${pair}&bar=${bar}&limit=${limit}`;
+  const interval = TIMEFRAME_MAP[tf.toLowerCase()] ?? '1h';
+  const symbol = pair.replace(/[^a-z0-9]/gi, '').toUpperCase();
+  const safeLimit = Math.max(1, Math.min(1000, Math.floor(limit) || 300));
+  const params = new URLSearchParams({ symbol, interval, limit: String(safeLimit) });
+  const url = `https://data-api.binance.vision/api/v3/klines?${params}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`OKX ${res.status}`);
-  const data = await res.json<any>();
-  if (data.code !== '0') throw new Error(`OKX: ${data.msg}`);
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Binance ${res.status}${detail ? `: ${detail}` : ''}`);
+  }
+  const data = await res.json<unknown>();
+  if (!Array.isArray(data)) throw new Error('Binance returned an unexpected candle response');
 
-  return (data.data as string[][])
+  return (data as unknown[][])
     .map((row) => ({
       time: Math.floor(Number(row[0]) / 1000),
       open: Number(row[1]),
@@ -32,8 +38,7 @@ export async function getCandles(
       low: Number(row[3]),
       close: Number(row[4]),
       volume: Number(row[5]),
-    }))
-    .reverse();
+    }));
 }
 
 export async function getFearGreed(): Promise<number | null> {
